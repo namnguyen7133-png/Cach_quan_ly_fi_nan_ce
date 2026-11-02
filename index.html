@@ -9,15 +9,20 @@ class FinancialManagementApp:
     def __init__(self, root):
         self.root = root
         self.root.title("Hệ Thống Quản Lý & Tư Duy Tài Chính Chuyên Sâu (12 Tab)")
-        self.root.geometry("1000x700")
+        self.root.geometry("1050x750")
         
-        # Cấu hình phong cách hiển thị rõ ràng, dễ đọc
+        # Cấu hình phong cách hiển thị rõ ràng, chống lỗi trắng chữ trên nền tối/sáng của Windows
         self.style = ttk.Style()
         self.style.theme_use('clam')
         self.style.configure('TNotebook.Tab', font=('Arial', 11, 'bold'), padding=[10, 5])
         self.style.configure('TButton', font=('Arial', 10, 'bold'))
-        self.style.configure('TLabel', font=('Arial', 10))
+        self.style.configure('TLabel', font=('Arial', 10), foreground='#000000', background='#f4f7f6')
+        self.style.configure('TFrame', background='#f4f7f6')
+        self.style.configure('TLabelframe', background='#f4f7f6')
+        self.style.configure('TLabelframe.Label', font=('Arial', 11, 'bold'), foreground='#2c3e50', background='#f4f7f6')
         
+        self.root.configure(bg='#f4f7f6')
+
         # Tạo thanh Notebook chứa 12 Tab
         self.notebook = ttk.Notebook(root)
         self.notebook.pack(fill='both', expand=True, padx=5, pady=5)
@@ -42,7 +47,7 @@ class FinancialManagementApp:
 
     def create_scrollable_tab(self, parent):
         container = ttk.Frame(parent)
-        canvas = tk.Canvas(container, borderwidth=0, highlightthickness=0)
+        canvas = tk.Canvas(container, borderwidth=0, highlightthickness=0, bg='#f4f7f6')
         scrollbar = ttk.Scrollbar(container, orient="vertical", command=canvas.yview)
         scrollable_frame = ttk.Frame(canvas, padding=15)
         
@@ -63,10 +68,10 @@ class FinancialManagementApp:
         tab = self.create_scrollable_tab(self.notebook)
         self.notebook.add(tab, text="1. Tài Chính Tổng Quát")
         
-        ttk.Label(tab, text="QUẢN LÝ THU NHẬP - CHI TIÊU - TÀI SẢN - NỢ", font=('Arial', 14, 'bold'), foreground='#2c3e50').pack(anchor='w', pady=5)
+        ttk.Label(tab, text="QUẢN LÝ THU NHẬP - CHI TIẾT - TÀI SẢN - NỢ", font=('Arial', 14, 'bold'), foreground='#2c3e50').pack(anchor='w', pady=5)
         
         # Thu nhập (10 ô)
-        lbl_inc = ttk.LabelFrame(tab, text="Thu Nhập (Nguồn & Số tiền)")
+        lbl_inc = ttk.LabelFrame(tab, text="Thu Nhập (Nguồn & Số tiền - 10 ô)")
         lbl_inc.pack(fill='x', pady=5)
         self.inc_entries = []
         sources = ["Lương chính", "Làm thêm (Freelance)", "Cho thuê nhà/mặt bằng", "Lãi đầu tư", "Nguồn khác 1", "Nguồn khác 2", "Nguồn khác 3", "Nguồn khác 4", "Nguồn khác 5", "Nguồn khác 6"]
@@ -99,7 +104,7 @@ class FinancialManagementApp:
         for d in debt_names:
             f = ttk.Frame(lbl_asset)
             f.pack(fill='x', pady=2)
-            ttk.Label(f, text=f"Nợ: {d}", width=25, foreground='red').pack(side='left')
+            ttk.Label(f, text=f"Nợ: {d}", width=25).pack(side='left')
             ent = ttk.Entry(f, width=20)
             ent.insert(0, "0")
             ent.pack(side='left', padx=5)
@@ -108,7 +113,7 @@ class FinancialManagementApp:
         btn_calc = ttk.Button(tab, text="Tính Giá Trị Ròng & Thước Đo Thật", command=self.calc_tab1)
         btn_calc.pack(pady=10)
         
-        self.lbl_result_tab1 = ttk.Label(tab, text="Kết quả sẽ hiển thị ở đây...", font=('Arial', 11, 'bold'), foreground='blue')
+        self.lbl_result_tab1 = ttk.Label(tab, text="Kết quả sẽ hiển thị ở đây...", font=('Arial', 11, 'bold'), foreground='#16a085')
         self.lbl_result_tab1.pack(anchor='w', pady=5)
 
     def calc_tab1(self):
@@ -133,7 +138,7 @@ class FinancialManagementApp:
         
         ttk.Label(tab, text="PHÂN BIỆT TIÊU SẢN VÀ TÀI SẢN SINH TIỀN", font=('Arial', 14, 'bold'), foreground='#2c3e50').pack(anchor='w', pady=5)
         
-        f1 = ttk.LabelFrame(tab, text="Tiêu sản (Xe hơi riêng chạy dịch vụ lỗ, sửa chữa, chi phí nuôi xe...)")
+        f1 = ttk.LabelFrame(tab, text="Tiêu sản (Chi phí nuôi xe, sửa chữa...)")
         f1.pack(fill='x', pady=5)
         self.ent_tieusan = ttk.Entry(f1, width=30)
         self.ent_tieusan.insert(0, "5000000")
@@ -164,21 +169,20 @@ class FinancialManagementApp:
         self.notebook.add(tab, text="3. Lạm Phát & Trượt Giá")
         
         ttk.Label(tab, text="LẠM PHÁT & LỖ THẦM LẶNG QUA THỜI GIAN", font=('Arial', 14, 'bold'), foreground='#2c3e50').pack(anchor='w', pady=5)
-        
         ttk.Label(tab, text="Ví dụ: Giá tô phở hoặc đất vàng cách đây 30 năm so với hiện tại.").pack(anchor='w', pady=5)
         
         f = ttk.Frame(tab)
         f.pack(fill='x', pady=5)
         ttk.Label(f, text="Giá trị gốc (30 năm trước):").pack(side='left')
         self.ent_goc = ttk.Entry(f, width=15)
-        self.ent_goc.insert(0, "2000") # ví dụ 2000đ bát phở
+        self.ent_goc.insert(0, "2000")
         self.ent_goc.pack(side='left', padx=5)
         
         f_hien_tai = ttk.Frame(tab)
         f_hien_tai.pack(fill='x', pady=5)
         ttk.Label(f_hien_tai, text="Giá trị hiện tại:").pack(side='left')
         self.ent_hientai = ttk.Entry(f_hien_tai, width=15)
-        self.ent_hientai.insert(0, "50000") # 50k bát phở
+        self.ent_hientai.insert(0, "50000")
         self.ent_hientai.pack(side='left', padx=5)
         
         ttk.Button(tab, text="Tính % Trượt Giá & Lạm Phát", command=self.calc_tab3).pack(pady=10)
@@ -190,7 +194,7 @@ class FinancialManagementApp:
             goc = float(self.ent_goc.get() or 1)
             ht = float(self.ent_hientai.get() or 1)
             tang = ((ht - goc) / goc) * 100
-            self.lbl_res_tab3.config(text=f"Mức tăng giá / trượt giá trong 30 năm: {tang:,.1f}%\nTiền mặt để không sẽ bị hao mòn sức mua tương ứng nếu không đầu tư sinh lời vượt lạm phát.")
+            self.lbl_res_tab3.config(text=f"Mức tăng giá / trượt giá trong 30 năm: {tang:,.1f}%\nTiền mặt để không sẽ bị hao mòn sức mua tương ứng nếu không đầu tư sinh lời.")
         except:
             pass
 
@@ -209,20 +213,19 @@ class FinancialManagementApp:
         self.ent_chitieu_thang.pack(side='left', padx=5)
         
         ttk.Button(tab, text="Tính Hạn Mức 3 Quỹ", command=self.calc_tab4).pack(pady=10)
-        
         self.lbl_res_tab4 = ttk.Label(tab, text="", font=('Arial', 11), justify='left')
         self.lbl_res_tab4.pack(anchor='w')
 
     def calc_tab4(self):
         try:
             ct = float(self.ent_chitieu_thang.get() or 0)
-            q1 = ct # Quỹ An tâm (1 tháng chi tiêu, xe hỏng, con ốm)
-            q2 = ct * 0.3 # Trả nợ tối thiểu tránh phạt
-            q3_min = ct * 3 # Khẩn cấp 3 tháng
-            q3_max = ct * 6 # Khẩn cấp 6 tháng
+            q1 = ct
+            q2 = ct * 0.3
+            q3_min = ct * 3
+            q3_max = ct * 6
             
             txt = (f"1. Quỹ An tâm (1 tháng dự phòng sự cố, con ốm, xe hỏng): {q1:,.0f} VNĐ\n"
-                   f"2. Khoản Trả nợ tối thiểu (tránh bị phạt lãi/nợ xấu): {q2:,.0f} VNĐ/tháng\n"
+                   f"2. Khoản Trả nợ tối thiểu (tránh phạt lãi/nợ xấu): {q2:,.0f} VNĐ/tháng\n"
                    f"3. Quỹ Khẩn cấp (3 - 6 tháng đủ sống khi mất việc): {q3_min:,.0f} đến {q3_max:,.0f} VNĐ")
             self.lbl_res_tab4.config(text=txt)
         except:
@@ -265,7 +268,7 @@ class FinancialManagementApp:
         self.notebook.add(tab, text="6. Chi Phí Cơ Hội")
         
         ttk.Label(tab, text="TÍNH TOÁN CHI PHÍ CƠ HỘI CỦA CÁC KHOẢN CHI", font=('Arial', 14, 'bold'), foreground='#2c3e50').pack(anchor='w', pady=5)
-        ttk.Label(tab, text="So sánh số tiền hiện có với giá trị các mục tiêu (Mua nhà, mua xe, bữa ăn sang trọng, giúp bạn bè...).").pack(anchor='w', pady=2)
+        ttk.Label(tab, text="So sánh số tiền hiện có với mục tiêu (Mua nhà, xe, bữa ăn sang trọng, giúp bạn bè...).").pack(anchor='w', pady=2)
         
         f1 = ttk.Frame(tab)
         f1.pack(fill='x', pady=5)
@@ -290,7 +293,7 @@ class FinancialManagementApp:
             co = float(self.ent_sotien_co.get() or 0)
             mt = float(self.ent_giatri_muctieu.get() or 1)
             pct = (co / mt) * 100
-            self.lbl_res_tab6.config(text=f"Bạn đang đáp ứng được {pct:.1f}% giá trị mục tiêu.\n(Lưu ý chi phí cơ hội: Dùng tiền này việc này nghĩa là bỏ lỡ cơ hội đầu tư sinh lời khác).")
+            self.lbl_res_tab6.config(text=f"Bạn đang đáp ứng được {pct:.1f}% giá trị mục tiêu.\n(Lưu ý chi phí cơ hội: Dùng tiền cho việc này nghĩa là bỏ lỡ cơ hội đầu tư sinh lời khác).")
         except:
             pass
 
@@ -305,8 +308,7 @@ class FinancialManagementApp:
                "• Thực tế đằng sau: Đa phần gánh những khoản nợ trả góp nặng nề, áp lực dòng tiền hàng tháng.\n"
                "• Bài học: Mạng xã hội chỉ là 'sân khấu' được biên tập kỹ lưỡng, không phải 'hậu trường' tài chính thực tế.\n"
                "Hãy tập trung vào giá trị thực, tài sản ròng và sự bình yên trong tâm hồn thay vì vỏ bọc hào nhoáng ảo.")
-        lbl = ttk.Label(tab, text=txt, font=('Arial', 11), justify='left', wraplength=900)
-        lbl.pack(anchor='w', pady=10)
+        ttk.Label(tab, text=txt, font=('Arial', 11), justify='left', wraplength=900).pack(anchor='w', pady=10)
 
     # --- TAB 8: Phát triển bản thân ---
     def init_tab8_phattrien_banthan(self):
@@ -401,7 +403,7 @@ class FinancialManagementApp:
                "• Kiên nhẫn là chìa khóa thành công trong tài chính cá nhân.")
         ttk.Label(tab, text=txt, font=('Arial', 11), justify='left', wraplength=900).pack(anchor='w', pady=10)
 
-    # --- HÀM LƯU DỮ LIỆU RA JSON (Tuân thủ chuẩn tên file động) ---
+    # --- HÀM LƯU DỮ LIỆU RA JSON (Chuẩn định dạng yêu cầu) ---
     def save_data_to_json(self):
         try:
             data = {
@@ -411,7 +413,6 @@ class FinancialManagementApp:
                 "no": {d: ent.get() for d, ent in self.debt_entries.items()}
             }
             
-            # Tên file động theo định dạng chuẩn: [TênScript]_[TênThưMụcNguồn]_[YYYYMMDD_HHMMSS].json
             script_name = "quan_ly_tai_chinh_chuyen_sau"
             dir_name = os.path.basename(os.getcwd())
             timestamp_str = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
@@ -420,7 +421,7 @@ class FinancialManagementApp:
             with open(filename, "w", encoding="utf-8") as f:
                 json.dump(data, f, ensure_ascii=False, indent=4)
                 
-            messagebox. thành công("Thành công", f"Đã lưu toàn bộ dữ liệu vào tệp:\n{filename}")
+            messagebox.showinfo("Thành công", f"Đã lưu toàn bộ dữ liệu vào tệp:\n{filename}")
         except Exception as e:
             messagebox.showerror("Lỗi", f"Không thể lưu tệp: {e}")
 
