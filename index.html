@@ -1,0 +1,430 @@
+import sys
+import os
+import json
+import datetime
+import tkinter as tk
+from tkinter import ttk, messagebox
+
+class FinancialManagementApp:
+    def __init__(self, root):
+        self.root = root
+        self.root.title("Hệ Thống Quản Lý & Tư Duy Tài Chính Chuyên Sâu (12 Tab)")
+        self.root.geometry("1000x700")
+        
+        # Cấu hình phong cách hiển thị rõ ràng, dễ đọc
+        self.style = ttk.Style()
+        self.style.theme_use('clam')
+        self.style.configure('TNotebook.Tab', font=('Arial', 11, 'bold'), padding=[10, 5])
+        self.style.configure('TButton', font=('Arial', 10, 'bold'))
+        self.style.configure('TLabel', font=('Arial', 10))
+        
+        # Tạo thanh Notebook chứa 12 Tab
+        self.notebook = ttk.Notebook(root)
+        self.notebook.pack(fill='both', expand=True, padx=5, pady=5)
+        
+        # Khởi tạo các Tab
+        self.init_tab1_thunhap_taisan()
+        self.init_tab2_tieusan_taisan()
+        self.init_tab3_lamphat()
+        self.init_tab4_3quy_baove()
+        self.init_tab5_phanbo_65_20_15()
+        self.init_tab6_chiphi_cohoi()
+        self.init_tab7_tamly_mang()
+        self.init_tab8_phattrien_banthan()
+        self.init_tab9_ancu_lacnghiep()
+        self.init_tab10_3cauhoi_thudong()
+        self.init_tab11_nguyentac_dautu()
+        self.init_tab12_thoigian_tichluy()
+        
+        # Thanh lưu trữ toàn cục
+        btn_save_all = ttk.Button(root, text="Lưu Toàn Bộ Dữ Liệu Ra JSON (Theo Chuẩn)", command=self.save_data_to_json)
+        btn_save_all.pack(fill='x', padx=10, pady=5)
+
+    def create_scrollable_tab(self, parent):
+        container = ttk.Frame(parent)
+        canvas = tk.Canvas(container, borderwidth=0, highlightthickness=0)
+        scrollbar = ttk.Scrollbar(container, orient="vertical", command=canvas.yview)
+        scrollable_frame = ttk.Frame(canvas, padding=15)
+        
+        scrollable_frame.bind(
+            "<Configure>",
+            lambda e: canvas.configure(scrollregion=canvas.bbox("all"))
+        )
+        canvas.create_window((0, 0), window=scrollable_frame, anchor="nw")
+        canvas.configure(yscrollcommand=scrollbar.set)
+        
+        container.pack(fill="both", expand=True)
+        canvas.pack(side="left", fill="both", expand=True)
+        scrollbar.pack(side="right", fill="y")
+        return scrollable_frame
+
+    # --- TAB 1: Thu nhập, Chi tiêu, Tài sản, Nợ & Giá trị ròng ---
+    def init_tab1_thunhap_taisan(self):
+        tab = self.create_scrollable_tab(self.notebook)
+        self.notebook.add(tab, text="1. Tài Chính Tổng Quát")
+        
+        ttk.Label(tab, text="QUẢN LÝ THU NHẬP - CHI TIÊU - TÀI SẢN - NỢ", font=('Arial', 14, 'bold'), foreground='#2c3e50').pack(anchor='w', pady=5)
+        
+        # Thu nhập (10 ô)
+        lbl_inc = ttk.LabelFrame(tab, text="Thu Nhập (Nguồn & Số tiền)")
+        lbl_inc.pack(fill='x', pady=5)
+        self.inc_entries = []
+        sources = ["Lương chính", "Làm thêm (Freelance)", "Cho thuê nhà/mặt bằng", "Lãi đầu tư", "Nguồn khác 1", "Nguồn khác 2", "Nguồn khác 3", "Nguồn khác 4", "Nguồn khác 5", "Nguồn khác 6"]
+        for s in sources:
+            f = ttk.Frame(lbl_inc)
+            f.pack(fill='x', pady=2)
+            ttk.Label(f, text=s, width=25).pack(side='left')
+            ent = ttk.Entry(f, width=20)
+            ent.insert(0, "0")
+            ent.pack(side='left', padx=5)
+            self.inc_entries.append((s, ent))
+            
+        # Tài sản & Nợ
+        lbl_asset = ttk.LabelFrame(tab, text="Tài Sản & Nợ (Tính Giá Trị Ròng)")
+        lbl_asset.pack(fill='x', pady=5)
+        
+        self.asset_entries = {}
+        assets_names = ["Tiền tiết kiệm", "Vàng", "Nhà đất", "Vốn góp kinh doanh", "Các tài sản khác"]
+        for a in assets_names:
+            f = ttk.Frame(lbl_asset)
+            f.pack(fill='x', pady=2)
+            ttk.Label(f, text=a, width=25).pack(side='left')
+            ent = ttk.Entry(f, width=20)
+            ent.insert(0, "0")
+            ent.pack(side='left', padx=5)
+            self.asset_entries[a] = ent
+            
+        self.debt_entries = {}
+        debt_names = ["Nợ ngân hàng", "Nợ tín dụng", "Nợ trả góp", "Nợ khác"]
+        for d in debt_names:
+            f = ttk.Frame(lbl_asset)
+            f.pack(fill='x', pady=2)
+            ttk.Label(f, text=f"Nợ: {d}", width=25, foreground='red').pack(side='left')
+            ent = ttk.Entry(f, width=20)
+            ent.insert(0, "0")
+            ent.pack(side='left', padx=5)
+            self.debt_entries[d] = ent
+            
+        btn_calc = ttk.Button(tab, text="Tính Giá Trị Ròng & Thước Đo Thật", command=self.calc_tab1)
+        btn_calc.pack(pady=10)
+        
+        self.lbl_result_tab1 = ttk.Label(tab, text="Kết quả sẽ hiển thị ở đây...", font=('Arial', 11, 'bold'), foreground='blue')
+        self.lbl_result_tab1.pack(anchor='w', pady=5)
+
+    def calc_tab1(self):
+        try:
+            total_inc = sum([float(ent.get() or 0) for _, ent in self.inc_entries])
+            total_asset = sum([float(ent.get() or 0) for ent in self.asset_entries.values()])
+            total_debt = sum([float(ent.get() or 0) for ent in self.debt_entries.values()])
+            net_worth = total_asset - total_debt
+            
+            res = (f"Tổng thu nhập: {total_inc:,.0f} VNĐ\n"
+                   f"Tổng tài sản: {total_asset:,.0f} VNĐ | Tổng nợ: {total_debt:,.0f} VNĐ\n"
+                   f"==> GIÁ TRỊ RÒNG (Net Worth): {net_worth:,.0f} VNĐ\n"
+                   f"(Thước đo thật: Tài sản thực tế trừ đi nghĩa vụ nợ sát với thực tế nhất).")
+            self.lbl_result_tab1.config(text=res)
+        except ValueError:
+            messagebox.showerror("Lỗi", "Vui lòng nhập các giá trị là số hợp lệ!")
+
+    # --- TAB 2: Tiêu sản & Tài sản sinh tiền ---
+    def init_tab2_tieusan_taisan(self):
+        tab = self.create_scrollable_tab(self.notebook)
+        self.notebook.add(tab, text="2. Tiêu Sản & Tài Sản")
+        
+        ttk.Label(tab, text="PHÂN BIỆT TIÊU SẢN VÀ TÀI SẢN SINH TIỀN", font=('Arial', 14, 'bold'), foreground='#2c3e50').pack(anchor='w', pady=5)
+        
+        f1 = ttk.LabelFrame(tab, text="Tiêu sản (Xe hơi riêng chạy dịch vụ lỗ, sửa chữa, chi phí nuôi xe...)")
+        f1.pack(fill='x', pady=5)
+        self.ent_tieusan = ttk.Entry(f1, width=30)
+        self.ent_tieusan.insert(0, "5000000")
+        self.ent_tieusan.pack(side='left', padx=5, pady=5)
+        ttk.Label(f1, text="VNĐ/tháng chi phí nuôi tiêu sản").pack(side='left')
+        
+        f2 = ttk.LabelFrame(tab, text="Tài sản ra tiền (Đầu tư, cho thuê, cổ tức...)")
+        f2.pack(fill='x', pady=5)
+        self.ent_taisan_tien = ttk.Entry(f2, width=30)
+        self.ent_taisan_tien.insert(0, "12000000")
+        self.ent_taisan_tien.pack(side='left', padx=5, pady=5)
+        ttk.Label(f2, text="VNĐ/tháng dòng tiền thu về").pack(side='left')
+        
+        btn = ttk.Button(tab, text="Tính Chênh Lệch Dòng Tiền", command=self.calc_tab2)
+        btn.pack(pady=10)
+        self.lbl_res_tab2 = ttk.Label(tab, text="", font=('Arial', 11))
+        self.lbl_res_tab2.pack(anchor='w')
+
+    def calc_tab2(self):
+        ts = float(self.ent_tieusan.get() or 0)
+        tt = float(self.ent_taisan_tien.get() or 0)
+        diff = tt - ts
+        self.lbl_res_tab2.config(text=f"Dòng tiền tài sản sinh ra: +{tt:,.0f} VNĐ\nChi phí nuôi tiêu sản: -{ts:,.0f} VNĐ\nChênh lệch ròng hàng tháng: {diff:,.0f} VNĐ")
+
+    # --- TAB 3: Lạm phát & Lỗ thầm lặng ---
+    def init_tab3_lamphat(self):
+        tab = self.create_scrollable_tab(self.notebook)
+        self.notebook.add(tab, text="3. Lạm Phát & Trượt Giá")
+        
+        ttk.Label(tab, text="LẠM PHÁT & LỖ THẦM LẶNG QUA THỜI GIAN", font=('Arial', 14, 'bold'), foreground='#2c3e50').pack(anchor='w', pady=5)
+        
+        ttk.Label(tab, text="Ví dụ: Giá tô phở hoặc đất vàng cách đây 30 năm so với hiện tại.").pack(anchor='w', pady=5)
+        
+        f = ttk.Frame(tab)
+        f.pack(fill='x', pady=5)
+        ttk.Label(f, text="Giá trị gốc (30 năm trước):").pack(side='left')
+        self.ent_goc = ttk.Entry(f, width=15)
+        self.ent_goc.insert(0, "2000") # ví dụ 2000đ bát phở
+        self.ent_goc.pack(side='left', padx=5)
+        
+        f_hien_tai = ttk.Frame(tab)
+        f_hien_tai.pack(fill='x', pady=5)
+        ttk.Label(f_hien_tai, text="Giá trị hiện tại:").pack(side='left')
+        self.ent_hientai = ttk.Entry(f_hien_tai, width=15)
+        self.ent_hientai.insert(0, "50000") # 50k bát phở
+        self.ent_hientai.pack(side='left', padx=5)
+        
+        ttk.Button(tab, text="Tính % Trượt Giá & Lạm Phát", command=self.calc_tab3).pack(pady=10)
+        self.lbl_res_tab3 = ttk.Label(tab, text="", font=('Arial', 11))
+        self.lbl_res_tab3.pack(anchor='w')
+
+    def calc_tab3(self):
+        try:
+            goc = float(self.ent_goc.get() or 1)
+            ht = float(self.ent_hientai.get() or 1)
+            tang = ((ht - goc) / goc) * 100
+            self.lbl_res_tab3.config(text=f"Mức tăng giá / trượt giá trong 30 năm: {tang:,.1f}%\nTiền mặt để không sẽ bị hao mòn sức mua tương ứng nếu không đầu tư sinh lời vượt lạm phát.")
+        except:
+            pass
+
+    # --- TAB 4: 3 Quỹ bảo vệ ---
+    def init_tab4_3quy_baove(self):
+        tab = self.create_scrollable_tab(self.notebook)
+        self.notebook.add(tab, text="4. 3 Quỹ Bảo Vệ")
+        
+        ttk.Label(tab, text="3 QUỸ BẢO VỆ TÀI CHÍNH CỐ ĐỊNH", font=('Arial', 14, 'bold'), foreground='#2c3e50').pack(anchor='w', pady=5)
+        
+        f = ttk.Frame(tab)
+        f.pack(fill='x', pady=5)
+        ttk.Label(f, text="Chi tiêu thiết yếu hàng tháng của gia đình:").pack(side='left')
+        self.ent_chitieu_thang = ttk.Entry(f, width=15)
+        self.ent_chitieu_thang.insert(0, "15000000")
+        self.ent_chitieu_thang.pack(side='left', padx=5)
+        
+        ttk.Button(tab, text="Tính Hạn Mức 3 Quỹ", command=self.calc_tab4).pack(pady=10)
+        
+        self.lbl_res_tab4 = ttk.Label(tab, text="", font=('Arial', 11), justify='left')
+        self.lbl_res_tab4.pack(anchor='w')
+
+    def calc_tab4(self):
+        try:
+            ct = float(self.ent_chitieu_thang.get() or 0)
+            q1 = ct # Quỹ An tâm (1 tháng chi tiêu, xe hỏng, con ốm)
+            q2 = ct * 0.3 # Trả nợ tối thiểu tránh phạt
+            q3_min = ct * 3 # Khẩn cấp 3 tháng
+            q3_max = ct * 6 # Khẩn cấp 6 tháng
+            
+            txt = (f"1. Quỹ An tâm (1 tháng dự phòng sự cố, con ốm, xe hỏng): {q1:,.0f} VNĐ\n"
+                   f"2. Khoản Trả nợ tối thiểu (tránh bị phạt lãi/nợ xấu): {q2:,.0f} VNĐ/tháng\n"
+                   f"3. Quỹ Khẩn cấp (3 - 6 tháng đủ sống khi mất việc): {q3_min:,.0f} đến {q3_max:,.0f} VNĐ")
+            self.lbl_res_tab4.config(text=txt)
+        except:
+            pass
+
+    # --- TAB 5: Phân bổ 65% - 20% - 15% ---
+    def init_tab5_phanbo_65_20_15(self):
+        tab = self.create_scrollable_tab(self.notebook)
+        self.notebook.add(tab, text="5. Phân Bổ 65-20-15")
+        
+        ttk.Label(tab, text="PHÂN BỔ THU NHẬP SAU THUẾ (65% - 20% - 15%)", font=('Arial', 14, 'bold'), foreground='#2c3e50').pack(anchor='w', pady=5)
+        
+        f = ttk.Frame(tab)
+        f.pack(fill='x', pady=5)
+        ttk.Label(f, text="Thu nhập sau thuế hàng tháng:").pack(side='left')
+        self.ent_thunhap_sauthue = ttk.Entry(f, width=15)
+        self.ent_thunhap_sauthue.insert(0, "20000000")
+        self.ent_thunhap_sauthue.pack(side='left', padx=5)
+        
+        ttk.Button(tab, text="Phân Bổ Quỹ", command=self.calc_tab5).pack(pady=10)
+        self.lbl_res_tab5 = ttk.Label(tab, text="", font=('Arial', 11), justify='left')
+        self.lbl_res_tab5.pack(anchor='w')
+
+    def calc_tab5(self):
+        try:
+            tn = float(self.ent_thunhap_sauthue.get() or 0)
+            p65 = tn * 0.65
+            p20 = tn * 0.20
+            p15 = tn * 0.15
+            txt = (f"• 65% Ăn uống, con cái, nhà cửa: {p65:,.0f} VNĐ\n"
+                   f"• 20% Hưởng thụ (cà phê, bạn bè, đi chơi, giải trí): {p20:,.0f} VNĐ\n"
+                   f"• 15% Tài chính tự do (tiết kiệm, đầu tư, trả nợ): {p15:,.0f} VNĐ")
+            self.lbl_res_tab5.config(text=txt)
+        except:
+            pass
+
+    # --- TAB 6: Chi phí cơ hội ---
+    def init_tab6_chiphi_cohoi(self):
+        tab = self.create_scrollable_tab(self.notebook)
+        self.notebook.add(tab, text="6. Chi Phí Cơ Hội")
+        
+        ttk.Label(tab, text="TÍNH TOÁN CHI PHÍ CƠ HỘI CỦA CÁC KHOẢN CHI", font=('Arial', 14, 'bold'), foreground='#2c3e50').pack(anchor='w', pady=5)
+        ttk.Label(tab, text="So sánh số tiền hiện có với giá trị các mục tiêu (Mua nhà, mua xe, bữa ăn sang trọng, giúp bạn bè...).").pack(anchor='w', pady=2)
+        
+        f1 = ttk.Frame(tab)
+        f1.pack(fill='x', pady=5)
+        ttk.Label(f1, text="Tổng số tiền bạn đang có:").pack(side='left')
+        self.ent_sotien_co = ttk.Entry(f1, width=15)
+        self.ent_sotien_co.insert(0, "100000000")
+        self.ent_sotien_co.pack(side='left', padx=5)
+        
+        f2 = ttk.Frame(tab)
+        f2.pack(fill='x', pady=5)
+        ttk.Label(f2, text="Giá trị món đồ/mục tiêu muốn mua:").pack(side='left')
+        self.ent_giatri_muctieu = ttk.Entry(f2, width=15)
+        self.ent_giatri_muctieu.insert(0, "500000000")
+        self.ent_giatri_muctieu.pack(side='left', padx=5)
+        
+        ttk.Button(tab, text="Tính % Khả Năng & Cơ Hội", command=self.calc_tab6).pack(pady=10)
+        self.lbl_res_tab6 = ttk.Label(tab, text="", font=('Arial', 11))
+        self.lbl_res_tab6.pack(anchor='w')
+
+    def calc_tab6(self):
+        try:
+            co = float(self.ent_sotien_co.get() or 0)
+            mt = float(self.ent_giatri_muctieu.get() or 1)
+            pct = (co / mt) * 100
+            self.lbl_res_tab6.config(text=f"Bạn đang đáp ứng được {pct:.1f}% giá trị mục tiêu.\n(Lưu ý chi phí cơ hội: Dùng tiền này việc này nghĩa là bỏ lỡ cơ hội đầu tư sinh lời khác).")
+        except:
+            pass
+
+    # --- TAB 7: Tâm lý mạng xã hội ---
+    def init_tab7_tamly_mang(self):
+        tab = self.create_scrollable_tab(self.notebook)
+        self.notebook.add(tab, text="7. Tâm Lý Mạng Xã Hội")
+        
+        ttk.Label(tab, text="SÂN KHẤU VÀ HẬU TRƯỜNG TÀI CHÍNH", font=('Arial', 14, 'bold'), foreground='#2c3e50').pack(anchor='w', pady=5)
+        
+        txt = ("• Nhìn thấy bạn bè trên mạng khoe xe sang, nhà đẹp, check-in du lịch...\n"
+               "• Thực tế đằng sau: Đa phần gánh những khoản nợ trả góp nặng nề, áp lực dòng tiền hàng tháng.\n"
+               "• Bài học: Mạng xã hội chỉ là 'sân khấu' được biên tập kỹ lưỡng, không phải 'hậu trường' tài chính thực tế.\n"
+               "Hãy tập trung vào giá trị thực, tài sản ròng và sự bình yên trong tâm hồn thay vì vỏ bọc hào nhoáng ảo.")
+        lbl = ttk.Label(tab, text=txt, font=('Arial', 11), justify='left', wraplength=900)
+        lbl.pack(anchor='w', pady=10)
+
+    # --- TAB 8: Phát triển bản thân ---
+    def init_tab8_phattrien_banthan(self):
+        tab = self.create_scrollable_tab(self.notebook)
+        self.notebook.add(tab, text="8. Phát Triển Bản Thân")
+        
+        ttk.Label(tab, text="ĐẦU TƯ VÀO CHÍNH MÌNH & TĂNG THU NHẬP", font=('Arial', 14, 'bold'), foreground='#2c3e50').pack(anchor='w', pady=5)
+        
+        txt = ("1. Tìm cách kiếm lãi từ kỹ năng chuyên môn.\n"
+               "2. Đầu tư vào tri thức, sức khỏe, học kỹ năng mới để gia tăng giá trị bản thân.\n"
+               "3. Tìm kiếm công việc tốt hơn, phát triển nghề nghiệp vững chắc.\n"
+               "Tài sản lớn nhất đời người chính là năng lực tạo ra thu nhập của chính bạn.")
+        ttk.Label(tab, text=txt, font=('Arial', 11), justify='left', wraplength=900).pack(anchor='w', pady=10)
+
+    # --- TAB 9: An cư lạc nghiệp ---
+    def init_tab9_ancu_lacnghiep(self):
+        tab = self.create_scrollable_tab(self.notebook)
+        self.notebook.add(tab, text="9. Mua Hay Thuê Nhà")
+        
+        ttk.Label(tab, text="AN CƯ LẠC NGHIỆP: MUA NHÀ HAY THUÊ NHÀ?", font=('Arial', 14, 'bold'), foreground='#2c3e50').pack(anchor='w', pady=5)
+        
+        f1 = ttk.Frame(tab)
+        f1.pack(fill='x', pady=2)
+        ttk.Label(f1, text="Tiền thuê nhà hàng tháng:").pack(side='left')
+        self.ent_thuenha = ttk.Entry(f1, width=15)
+        self.ent_thuenha.insert(0, "7000000")
+        self.ent_thuenha.pack(side='left', padx=5)
+        
+        f2 = ttk.Frame(tab)
+        f2.pack(fill='x', pady=2)
+        ttk.Label(f2, text="Lãi suất vay mua nhà/năm (%):").pack(side='left')
+        self.ent_laisuat = ttk.Entry(f2, width=15)
+        self.ent_laisuat.insert(0, "10")
+        self.ent_laisuat.pack(side='left', padx=5)
+        
+        ttk.Button(tab, text="Phân Tích Mua vs Thuê", command=self.calc_tab9).pack(pady=10)
+        self.lbl_res_tab9 = ttk.Label(tab, text="", font=('Arial', 11), justify='left')
+        self.lbl_res_tab9.pack(anchor='w')
+
+    def calc_tab9(self):
+        try:
+            tn = float(self.ent_thuenha.get() or 0)
+            ls = float(self.ent_laisuat.get() or 0)
+            txt = (f"• Chi phí thuê nhà 1 năm: {tn*12:,.0f} VNĐ\n"
+                   f"• Khi mua nhà bằng vốn vay lãi suất {ls}%, cần tính tổng tiền lãi vay, thuế, phí bảo trì xem có vượt quá khả năng dòng tiền không.\n"
+                   f"Lời khuyên: Chỉ mua nhà khi đã có vốn tự có vững chắc, không để áp lực trả nợ bóp nghẹt cuộc sống.")
+            self.lbl_res_tab9.config(text=txt)
+        except:
+            pass
+
+    # --- TAB 10: 3 Câu hỏi bẫy thu nhập thụ động ---
+    def init_tab10_3cauhoi_thudong(self):
+        tab = self.create_scrollable_tab(self.notebook)
+        self.notebook.add(tab, text="10. 3 Câu Hỏi Thu Thụ Động")
+        
+        ttk.Label(tab, text="3 CÂU HỎI TRÁNH BẪY THU NHẬP THỤ ĐỘNG", font=('Arial', 14, 'bold'), foreground='#2c3e50').pack(anchor='w', pady=5)
+        
+        txt = ("Trước khi tham gia bất kỳ mô hình 'thu nhập thụ động' nào, hãy hỏi rõ 3 câu:\n\n"
+               "1. Cần bỏ ra số vốn ban đầu bao nhiêu?\n"
+               "2. Cần đánh đổi công sức và thời gian quản lý thế nào?\n"
+               "3. Mức độ rủi ro mất vốn ra sao (có phải mô hình bánh vẽ/đa cấp không)?\n\n"
+               "Không có lợi nhuận phi lý nào đi kèm rủi ro bằng không.")
+        ttk.Label(tab, text=txt, font=('Arial', 11), justify='left', wraplength=900).pack(anchor='w', pady=10)
+
+    # --- TAB 11: Nguyên tắc đầu tư ---
+    def init_tab11_nguyentac_dautu(self):
+        tab = self.create_scrollable_tab(self.notebook)
+        self.notebook.add(tab, text="11. Nguyên Tắc Đầu Tư")
+        
+        ttk.Label(tab, text="NGUYÊN TẮC ĐẦU TƯ AN TOÀN & BỀN VỮNG", font=('Arial', 14, 'bold'), foreground='#2c3e50').pack(anchor='w', pady=5)
+        
+        txt = ("• Kênh đầu tư: Chứng khoán, Vàng, Bất động sản, Góp vốn kinh doanh...\n"
+               "• Nguyên tắc cốt lõi:\n"
+               "  1. Ưu tiên đầu tư đơn giản, dài hạn, đa dạng hóa.\n"
+               "  2. Tuyệt đối không hoảng loạn trước biến động ngắn hạn.\n"
+               "  3. Chỉ đầu tư bằng số tiền nhàn rỗi (mất không ảnh hưởng cuộc sống).\n"
+               "• Kiểm tra trước khi đầu tư:\n"
+               "  - Đã có quỹ khẩn cấp chưa?\n"
+               "  - Đã trả hết các khoản nợ lãi cao chưa?\n"
+               "  - Mỗi tháng có dòng tiền thặng dư đều đặn để đầu tư không?")
+        ttk.Label(tab, text=txt, font=('Arial', 11), justify='left', wraplength=900).pack(anchor='w', pady=10)
+
+    # --- TAB 12: Thời gian & Tích lũy ---
+    def init_tab12_thoigian_tichluy(self):
+        tab = self.create_scrollable_tab(self.notebook)
+        self.notebook.add(tab, text="12. Thời Gian & Tích Lũy")
+        
+        ttk.Label(tab, text="SỨC MẠNH CỦA THỜI GIAN VÀ TÍCH LŨY MỖI NGÀY", font=('Arial', 14, 'bold'), foreground='#2c3e50').pack(anchor='w', pady=5)
+        
+        txt = ("• Tích lũy mỗi ngày một ít, dù số tiền nhỏ đến đâu cũng tạo nên thói quen tài chính tuyệt vời.\n"
+               "• Lãi suất kép là kỳ quan thứ 8 của thế giới. Người hiểu nó sẽ tận dụng thời gian để chiến thắng.\n"
+               "• Kiên nhẫn là chìa khóa thành công trong tài chính cá nhân.")
+        ttk.Label(tab, text=txt, font=('Arial', 11), justify='left', wraplength=900).pack(anchor='w', pady=10)
+
+    # --- HÀM LƯU DỮ LIỆU RA JSON (Tuân thủ chuẩn tên file động) ---
+    def save_data_to_json(self):
+        try:
+            data = {
+                "timestamp": datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+                "thu_nhap": {s: ent.get() for s, ent in self.inc_entries},
+                "tai_san": {a: ent.get() for a, ent in self.asset_entries.items()},
+                "no": {d: ent.get() for d, ent in self.debt_entries.items()}
+            }
+            
+            # Tên file động theo định dạng chuẩn: [TênScript]_[TênThưMụcNguồn]_[YYYYMMDD_HHMMSS].json
+            script_name = "quan_ly_tai_chinh_chuyen_sau"
+            dir_name = os.path.basename(os.getcwd())
+            timestamp_str = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
+            filename = f"{script_name}_{dir_name}_{timestamp_str}.json"
+            
+            with open(filename, "w", encoding="utf-8") as f:
+                json.dump(data, f, ensure_ascii=False, indent=4)
+                
+            messagebox. thành công("Thành công", f"Đã lưu toàn bộ dữ liệu vào tệp:\n{filename}")
+        except Exception as e:
+            messagebox.showerror("Lỗi", f"Không thể lưu tệp: {e}")
+
+if __name__ == "__main__":
+    root = tk.Tk()
+    app = FinancialManagementApp(root)
+    root.mainloop()
