@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hệ Thống Tư Duy & Quản Lý Tài Chính 12 Tab</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Arial, sans-serif; }
+        body { background-color: #f4f7f6; padding: 10px; color: #333; }
+        
+        /* Thanh menu chuyển đổi giữa các tệp HTML trong Repo */
+        .repo-nav {
+            max-width: 900px;
+            margin: 0 auto 10px auto;
+            background: #1a252f;
+            padding: 8px 12px;
+            border-radius: 8px;
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+        .repo-nav span {
+            color: #bdc3c7;
+            font-size: 13px;
+            font-weight: bold;
+        }
+        .repo-nav a {
+            color: #fff;
+            background: #2c3e50;
+            padding: 6px 12px;
+            border-radius: 4px;
+            text-decoration: none;
+            font-size: 13px;
+            transition: 0.2s;
+        }
+        .repo-nav a:hover, .repo-nav a.active-file {
+            background: #27ae60;
+        }
+
+        .container { max-width: 900px; margin: 0 auto; background: #fff; border-radius: 10px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); overflow: hidden; }
+        .header { background: #2c3e50; color: white; padding: 15px; text-align: center; }
+        .tabs { display: flex; overflow-x: auto; background: #ecf0f1; border-bottom: 2px solid #bdc3c7; white-space: nowrap; }
+        .tab-btn { padding: 12px 16px; border: none; background: inherit; cursor: pointer; font-size: 13px; font-weight: bold; color: #555; flex-shrink: 0; }
+        .tab-btn.active { background: #fff; color: #2980b9; border-bottom: 3px solid #2980b9; }
+        .tab-content { display: none; padding: 20px; }
+        .tab-content.active { display: block; }
+        .form-group { margin-bottom: 12px; }
+        label { display: block; margin-bottom: 4px; font-weight: 600; font-size: 14px; }
+        input { width: 100%; padding: 8px 10px; border: 1px solid #ccc; border-radius: 5px; font-size: 15px; }
+        button.btn-calc { background: #27ae60; color: white; padding: 10px 15px; border: none; border-radius: 5px; cursor: pointer; font-size: 15px; font-weight: bold; width: 100%; margin-top: 10px; }
+        .result-box { background: #eef9f1; border-left: 4px solid #27ae60; padding: 12px; margin-top: 15px; font-weight: 600; line-height: 1.6; white-space: pre-line; }
+        .info-card { background: #f8f9fa; border-left: 4px solid #2980b9; padding: 15px; margin-bottom: 15px; border-radius: 4px; line-height: 1.6; }
+        .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+        @media (max-width: 600px) { .grid-2 { grid-template-columns: 1fr; } }
+    </style>
+</head>
+<body>
+
+<!-- Thanh điều hướng nhanh giữa các tệp HTML trong Repo GitHub của bạn -->
+<div class="repo-nav">
+    <span>📂 Chuyển hệ thống:</span>
+    <a href="index.html" class="active-file">🧠 12 Tab Tư Duy</a>
+    <a href="taichinhtoancau.html">🌍 Tài Chính Toàn Cầu</a>
+    <!-- Bạn có thể thêm link tới các file html khác ở đây, ví dụ: <a href="6hu.html">Quản Lý 6 Hũ</a> -->
+</div>
+
+<div class="container">
+    <div class="header">
+        <h2>Quản Lý & Tư Duy Tài Chính Chuyên Sâu</h2>
+    </div>
+
+    <!-- Thanh chuyển 12 Tab -->
+    <div class="tabs">
+        <button class="tab-btn active" onclick="openTab(event, 't1')">1. Tài Chính Tổng Quát</button>
+        <button class="tab-btn" onclick="openTab(event, 't2')">2. Tiêu Sản & Tài Sản</button>
+        <button class="tab-btn" onclick="openTab(event, 't3')">3. Lạm Phát & Trượt Giá</button>
+        <button class="tab-btn" onclick="openTab(event, 't4')">4. 3 Quỹ Bảo Vệ</button>
+        <button class="tab-btn" onclick="openTab(event, 't5')">5. Phân Bổ 65-20-15</button>
+        <button class="tab-btn" onclick="openTab(event, 't6')">6. Chi Phí Cơ Hội</button>
+        <button class="tab-btn" onclick="openTab(event, 't7')">7. Tâm Lý Mạng XH</button>
+        <button class="tab-btn" onclick="openTab(event, 't8')">8. Phát Triển Bản Thân</button>
+        <button class="tab-btn" onclick="openTab(event, 't9')">9. Mua Hay Thuê Nhà</button>
+        <button class="tab-btn" onclick="openTab(event, 't10')">10. 3 Câu Hỏi Thụ Động</button>
+        <button class="tab-btn" onclick="openTab(event, 't11')">11. Nguyên Tắc Đầu Tư</button>
+        <button class="tab-btn" onclick="openTab(event, 't12')">12. Thời Gian & Tích Lũy</button>
+    </div>
+
+    <!-- TAB 1: Thu nhập, Tài sản, Nợ, Giá trị ròng -->
+    <div id="t1" class="tab-content active">
+        <h3>1. Quản Lý Thu Nhập - Tài Sản - Nợ</h3>
+        <h4 style="margin:10px 0 5px 0;">Thu nhập (10 nguồn):</h4>
+        <div class="grid-2">
+            <div class="form-group"><label>Lương chính:</label><input type="number" class="inc-in" value="0"></div>
+            <div class="form-group"><label>Làm thêm:</label><input type="number" class="inc-in" value="0"></div>
+            <div class="form-group"><label>Cho thuê nhà:</label><input type="number" class="inc-in" value="0"></div>
+            <div class="form-group"><label>Lãi đầu tư:</label><input type="number" class="inc-in" value="0"></div>
+            <div class="form-group"><label>Nguồn khác 1:</label><input type="number" class="inc-in" value="0"></div>
+            <div class="form-group"><label>Nguồn khác 2:</label><input type="number" class="inc-in" value="0"></div>
+            <div class="form-group"><label>Nguồn khác 3:</label><input type="number" class="inc-in" value="0"></div>
+            <div class="form-group"><label>Nguồn khác 4:</label><input type="number" class="inc-in" value="0"></div>
+            <div class="form-group"><label>Nguồn khác 5:</label><input type="number" class="inc-in" value="0"></div>
+            <div class="form-group"><label>Nguồn khác 6:</label><input type="number" class="inc-in" value="0"></div>
+        </div>
+
+        <h4 style="margin:10px 0 5px 0;">Tài sản & Nợ:</h4>
+        <div class="grid-2">
+            <div class="form-group"><label>Tiền tiết kiệm, vàng:</label><input type="number" id="asset1" value="0"></div>
+            <div class="form-group"><label>Nhà đất, vốn góp:</label><input type="number" id="asset2" value="0"></div>
+            <div class="form-group"><label style="color:red;">Nợ ngân hàng, tín dụng:</label><input type="number" id="debt1" value="0"></div>
+            <div class="form-group"><label style="color:red;">Nợ trả góp, khác:</label><input type="number" id="debt2" value="0"></div>
+        </div>
+        <button class="btn-calc" onclick="calcT1()">Tính Giá Trị Ròng</button>
+        <div class="result-box" id="res1">Kết quả sẽ hiển thị ở đây...</div>
+    </div>
+
+    <!-- TAB 2: Tiêu sản vs Tài sản -->
+    <div id="t2" class="tab-content">
+        <h3>2. Phân Biệt Tiêu Sản & Tài Sản</h3>
+        <div class="form-group"><label>Chi phí nuôi tiêu sản/tháng (Sửa xe, khấu hao...):</label><input type="number" id="t2_ts" value="5000000"></div>
+        <div class="form-group"><label>Dòng tiền tài sản thu về/tháng (Đầu tư, cho thuê...):</label><input type="number" id="t2_tt" value="12000000"></div>
+        <button class="btn-calc" onclick="calcT2()">Tính Chênh Lệch Dòng Tiền</button>
+        <div class="result-box" id="res2">...</div>
+    </div>
+
+    <!-- TAB 3: Lạm phát -->
+    <div id="t3" class="tab-content">
+        <h3>3. Lạm Phát & Lỗ Thầm Lặng</h3>
+        <div class="form-group"><label>Giá trị gốc (Ví dụ: Giá tô phở / đất vàng 30 năm trước):</label><input type="number" id="t3_goc" value="2000"></div>
+        <div class="form-group"><label>Giá trị hiện tại:</label><input type="number" id="t3_ht" value="50000"></div>
+        <button class="btn-calc" onclick="calcT3()">Tính Mức Trượt Giá</button>
+        <div class="result-box" id="res3">...</div>
+    </div>
+
+    <!-- TAB 4: 3 Quỹ bảo vệ -->
+    <div id="t4" class="tab-content">
+        <h3>4. 3 Quỹ Bảo Vệ Tài Chính</h3>
+        <div class="form-group"><label>Chi tiêu thiết yếu 1 tháng của gia đình (VNĐ):</label><input type="number" id="t4_ct" value="15000000"></div>
+        <button class="btn-calc" onclick="calcT4()">Tính Định Mức 3 Quỹ</button>
+        <div class="result-box" id="res4">...</div>
+    </div>
+
+    <!-- TAB 5: 65% - 20% - 15% -->
+    <div id="t5" class="tab-content">
+        <h3>5. Phân Bổ Thu Nhập Sau Thuế (65% - 20% - 15%)</h3>
+        <div class="form-group"><label>Thu nhập sau thuế hàng tháng (VNĐ):</label><input type="number" id="t5_tn" value="20000000"></div>
+        <button class="btn-calc" onclick="calcT5()">Phân Bổ Quỹ</button>
+        <div class="result-box" id="res5">...</div>
+    </div>
+
+    <!-- TAB 6: Chi phí cơ hội -->
+    <div id="t6" class="tab-content">
+        <h3>6. Tính Toán Chi Phí Cơ Hội</h3>
+        <div class="form-group"><label>Số tiền hiện có (VNĐ):</label><input type="number" id="t6_co" value="100000000"></div>
+        <div class="form-group"><label>Giá trị mục tiêu (Nhà, xe, đồ hiệu...):</label><input type="number" id="t6_mt" value="500000000"></div>
+        <button class="btn-calc" onclick="calcT6()">Tính Khả Năng Đáp Ứng</button>
+        <div class="result-box" id="res6">...</div>
+    </div>
+
+    <!-- TAB 7: Tâm lý mạng -->
+    <div id="t7" class="tab-content">
+        <h3>7. Tâm Lý Mạng Xã Hội (Sân Khấu & Hậu Trường)</h3>
+        <div class="info-card">
+            • Nhìn bạn bè khoe xe sang, du lịch... Đằng sau thường là gánh nặng nợ trả góp.<br>
+            • Mạng xã hội chỉ là "sân khấu" được biên tập, không phải "hậu trường" tài chính.<br>
+            • Hãy tập trung vào giá trị thực và tài sản ròng thay vì vỏ bọc ảo.
+        </div>
+    </div>
+
+    <!-- TAB 8: Phát triển bản thân -->
+    <div id="t8" class="tab-content">
+        <h3>8. Phát Triển Bản Thân & Tăng Thu Nhập</h3>
+        <div class="info-card">
+            1. Tìm cách kiếm lãi từ chính kỹ năng chuyên môn của bạn.<br>
+            2. Đầu tư vào tri thức, sức khỏe, nâng cao giá trị tay nghề.<br>
+            3. Tìm công việc tốt hơn, phát triển sự nghiệp bền vững.<br>
+            <b>Tài sản lớn nhất là khả năng tạo ra dòng tiền của chính bạn.</b>
+        </div>
+    </div>
+
+    <!-- TAB 9: Mua hay thuê nhà -->
+    <div id="t9" class="tab-content">
+        <h3>9. An Cư Lạc Nghiệp: Mua Hay Thuê Nhà?</h3>
+        <div class="form-group"><label>Tiền thuê nhà hàng tháng:</label><input type="number" id="t9_thue" value="7000000"></div>
+        <div class="form-group"><label>Lãi suất vay mua nhà/năm (%):</label><input type="number" id="t9_ls" value="10"></div>
+        <button class="btn-calc" onclick="calcT9()">Phân Tích Dòng Tiền</button>
+        <div class="result-box" id="res9">...</div>
+    </div>
+
+    <!-- TAB 10: 3 Câu hỏi thụ động -->
+    <div id="t10" class="tab-content">
+        <h3>10. 3 Câu Hỏi Tránh Bẫy Thu Nhập Thụ Động</h3>
+        <div class="info-card">
+            Trước khi tham gia bất kỳ mô hình nào, hãy tự hỏi:<br><br>
+            1. Cần bỏ ra bao nhiêu vốn ban đầu?<br>
+            2. Đánh đổi thời gian và công sức quản lý ra sao?<br>
+            3. Rủi ro mất vốn thế nào?<br><br>
+            <b>Không có lợi nhuận cao nào đi kèm với rủi ro bằng không.</b>
+        </div>
+    </div>
+
+    <!-- TAB 11: Nguyên tắc đầu tư -->
+    <div id="t11" class="tab-content">
+        <h3>11. Nguyên Tắc Đầu Tư An Toàn</h3>
+        <div class="info-card">
+            • <b>Các kênh:</b> Chứng khoán, Vàng, BĐS, Góp vốn...<br>
+            • <b>Nguyên tắc:</b> Đầu tư đơn giản, dài hạn, đa dạng hóa.<br>
+            • <b>Tâm lý:</b> Không hoảng loạn, chỉ đầu tư số tiền nhàn rỗi.<br>
+            • <b>Điều kiện:</b> Phải có Quỹ khẩn cấp và trả xong nợ lãi cao trước khi đầu tư.
+        </div>
+    </div>
+
+    <!-- TAB 12: Thời gian & Tích lũy -->
+    <div id="t12" class="tab-content">
+        <h3>12. Sức Mạnh Của Thời Gian & Tích Lũy</h3>
+        <div class="info-card">
+            • Tích lũy mỗi ngày một ít, dù số tiền nhỏ đến đâu.<br>
+            • Lãi suất kép kết hợp với thời gian sẽ tạo nên tài sản lớn.<br>
+            • Kiên nhẫn là chìa khóa vàng của tự do tài chính.
+        </div>
+    </div>
+</div>
+
+<script>
+    function openTab(evt, tabId) {
+        let contents = document.getElementsByClassName("tab-content");
+        for (let c of contents) c.classList.remove("active");
+        let btns = document.getElementsByClassName("tab-btn");
+        let activeTabBtn = document.querySelector('.tab-btn.active');
+        if (activeTabBtn) activeTabBtn.classList.remove("active");
+        
+        document.getElementById(tabId).classList.add("active");
+        evt.currentTarget.classList.add("active");
+    }
+
+    const fmt = v => new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(v);
+
+    function calcT1() {
+        let incs = document.querySelectorAll('.inc-in');
+        let sumInc = 0;
+        incs.forEach(i => sumInc += parseFloat(i.value || 0));
+        let a1 = parseFloat(document.getElementById('asset1').value || 0);
+        let a2 = parseFloat(document.getElementById('asset2').value || 0);
+        let d1 = parseFloat(document.getElementById('debt1').value || 0);
+        let d2 = parseFloat(document.getElementById('debt2').value || 0);
+        let totalAsset = a1 + a2, totalDebt = d1 + d2;
+        let netWorth = totalAsset - totalDebt;
+        document.getElementById('res1').innerText = 
+            `Tổng thu nhập: ${fmt(sumInc)}\nTổng tài sản: ${fmt(totalAsset)} | Tổng nợ: ${fmt(totalDebt)}\n==> GIÁ TRỊ RÒNG: ${fmt(netWorth)}\n(Thước đo thật về sức mạnh tài chính thực tế).`;
+    }
+
+    function calcT2() {
+        let ts = parseFloat(document.getElementById('t2_ts').value || 0);
+        let tt = parseFloat(document.getElementById('t2_tt').value || 0);
+        document.getElementById('res2').innerText = `Tài sản ra tiền: +${fmt(tt)}\nChi phí tiêu sản: -${fmt(ts)}\nChênh lệch ròng/tháng: ${fmt(tt - ts)}`;
+    }
+
+    function calcT3() {
+        let goc = parseFloat(document.getElementById('t3_goc').value || 1);
+        let ht = parseFloat(document.getElementById('t3_ht').value || 1);
+        let pct = ((ht - goc) / goc) * 100;
+        document.getElementById('res3').innerText = `Mức trượt giá: ${pct.toFixed(1)}%\nTiền mặt không đầu tư sẽ bị hao mòn sức mua theo thời gian.`;
+    }
+
+    function calcT4() {
+        let ct = parseFloat(document.getElementById('t4_ct').value || 0);
+        document.getElementById('res4').innerText = 
+            `1. Quỹ An tâm (1 tháng): ${fmt(ct)}\n2. Trả nợ tối thiểu tránh phạt: ${fmt(ct * 0.3)}/tháng\n3. Quỹ Khẩn cấp (3-6 tháng): ${fmt(ct * 3)} đến ${fmt(ct * 6)}`;
+    }
+
+    function calcT5() {
+        let tn = parseFloat(document.getElementById('t5_tn').value || 0);
+        document.getElementById('res5').innerText = 
+            `• 65% Chi thiết yếu, con cái, nhà cửa: ${fmt(tn * 0.65)}\n• 20% Hưởng thụ (cà phê, giải trí): ${fmt(tn * 0.20)}\n• 15% Tự do tài chính, đầu tư, trả nợ: ${fmt(tn * 0.15)}`;
+    }
+
+    function calcT6() {
+        let co = parseFloat(document.getElementById('t6_co').value || 0);
+        let mt = parseFloat(document.getElementById('t6_mt').value || 1);
+        document.getElementById('res6').innerText = `Đáp ứng được: ${((co / mt) * 100).toFixed(1)}% giá trị mục tiêu.`;
+    }
+
+    function calcT9() {
+        let thue = parseFloat(document.getElementById('t9_thue').value || 0);
+        let ls = parseFloat(document.getElementById('t9_ls').value || 0);
+        document.getElementById('res9').innerText = `Tiền thuê 1 năm: ${fmt(thue * 12)}\nVay mua nhà với lãi ${ls}%/năm cần đảm bảo không vượt quá sức chi trả dòng tiền hàng tháng.`;
+    }
+</script>
+
+</body>
+</html>
