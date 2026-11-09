@@ -8,34 +8,41 @@
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Arial, sans-serif; }
         body { background-color: #f4f7f6; padding: 10px; color: #333; }
         
-        /* Thanh menu chuyển đổi giữa các tệp HTML trong Repo */
+        /* Thanh menu chuyển đổi linh hoạt giữa các tệp HTML trong Repo */
         .repo-nav {
             max-width: 900px;
             margin: 0 auto 10px auto;
             background: #1a252f;
-            padding: 8px 12px;
+            padding: 10px 15px;
             border-radius: 8px;
             display: flex;
-            gap: 10px;
+            gap: 12px;
             flex-wrap: wrap;
             align-items: center;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.15);
         }
         .repo-nav span {
             color: #bdc3c7;
             font-size: 13px;
             font-weight: bold;
         }
-        .repo-nav a {
-            color: #fff;
+        .repo-select {
+            flex: 1;
+            min-width: 250px;
+            padding: 8px 12px;
             background: #2c3e50;
-            padding: 6px 12px;
-            border-radius: 4px;
-            text-decoration: none;
-            font-size: 13px;
-            transition: 0.2s;
+            color: #fff;
+            border: 1px solid #415b76;
+            border-radius: 5px;
+            font-size: 14px;
+            font-weight: bold;
+            cursor: pointer;
+            outline: none;
         }
-        .repo-nav a:hover, .repo-nav a.active-file {
-            background: #27ae60;
+        .repo-select option {
+            background: #2c3e50;
+            color: #fff;
+            padding: 5px;
         }
 
         .container { max-width: 900px; margin: 0 auto; background: #fff; border-radius: 10px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); overflow: hidden; }
@@ -57,12 +64,29 @@
 </head>
 <body>
 
-<!-- Thanh điều hướng nhanh giữa các tệp HTML trong Repo GitHub của bạn -->
+<!-- Thanh điều hướng chọn nhanh toàn bộ các tệp HTML trong Repo GitHub -->
 <div class="repo-nav">
-    <span>📂 Chuyển hệ thống:</span>
-    <a href="index.html" class="active-file">🧠 12 Tab Tư Duy</a>
-    <a href="taichinhtoancau.html">🌍 Tài Chính Toàn Cầu</a>
-    <!-- Bạn có thể thêm link tới các file html khác ở đây, ví dụ: <a href="6hu.html">Quản Lý 6 Hũ</a> -->
+    <span>📂 Chọn hệ thống / Tệp HTML trong Repo:</span>
+    <select id="repoFileSelect" class="repo-select" onchange="navigateToPage(this.value)">
+        <option value="" disabled selected>-- Chọn tệp HTML để mở --</option>
+        <option value="index.html">🧠 12 Tab Tư Duy (Trang chủ)</option>
+        <option value="taichinhtoancau.html">🌍 Tài Chính Toàn Cầu</option>
+        <option value="TCDN QUANG TRUNG SO DO TU DUY.html">📊 TCDN Quang Trung - Sơ Đồ Tư Duy</option>
+        <option value="TCDN QUANG TRUNG 34 RA QUYET DINH DOI....html">⚖️ TCDN Quang Trung - 34 Ra Quyết Định</option>
+        <option value="TCDN QUANG TRUNG 56 PHAN 34.html">📑 TCDN Quang Trung - 56 Phần 34</option>
+        <option value="TCDN QUANG TRUNG 78.html">📑 TCDN Quang Trung - Phần 78</option>
+        <option value="TCDN QUANG TRUNG c1 TONG QUAN.html">📖 TCDN Quang Trung - C1 Tổng Quan</option>
+        <option value="TCDN QUANG TRUNG c2 CHUA BTTT P1.html">📝 TCDN Quang Trung - C2 BTTT P1</option>
+        <option value="TCDN QUANG TRUNG c2 CHUA BTTT P2.html">📝 TCDN Quang Trung - C2 BTTT P2</option>
+        <option value="TCDN QUANG TRUNG c2 CHUA BTTT P3.html">📝 TCDN Quang Trung - C2 BTTT P3</option>
+        <option value="TCDN QUANG TRUNG c2 CHUA BTTT P4.html">📝 TCDN Quang Trung - C2 BTTT P4</option>
+        <option value="TCDN QUANG TRUNG c2 DTDHP1.html">📝 TCDN Quang Trung - C2 DTDHP1</option>
+        <option value="TCDN QUANG TRUNG c2 P1.html">📝 TCDN Quang Trung - C2 P1</option>
+        <option value="TCDN QUANG TRUNG c2 P2.html">📝 TCDN Quang Trung - C2 P2</option>
+        <option value="TCDN QUANG TRUNG c2 P3.html">📝 TCDN Quang Trung - C2 P3</option>
+        <option value="TCDN QUANG TRUNG c2 P4.html">📝 TCDN Quang Trung - C2 P4</option>
+        <option value="TCDN QUANG TRUNG c2 UD EXCEL P1.html">📈 TCDN Quang Trung - C2 UD Excel P1</option>
+    </select>
 </div>
 
 <div class="container">
@@ -231,6 +255,12 @@
         
         document.getElementById(tabId).classList.add("active");
         evt.currentTarget.classList.add("active");
+    }
+
+    function navigateToPage(filename) {
+        if (filename) {
+            window.location.href = filename;
+        }
     }
 
     const fmt = v => new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(v);
